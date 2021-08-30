@@ -31,6 +31,17 @@ app.get('/api/persons', (req, res) => {
     res.send(data);
 })
 
+app.get('/api/persons/:id', (req, res) => {
+    const id = Number(req.params.id)
+    const note = data.find(note => note.id === id)
+
+    if(note) {
+        res.send(note)
+    } else {
+        res.status(404).end()
+    }
+})
+
 app.get('/info', (req, res) => {
     const size = data.length
     const date = new Date()
