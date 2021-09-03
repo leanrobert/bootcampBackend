@@ -2,7 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
-const Note = require('./models/phonebook')
+const Phonebook = require('./models/phonebook')
 
 const app = express()
 
@@ -16,31 +16,8 @@ morgan.token('content', function (req, res) {
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :content'))
 
-let data = [
-    { 
-      "id": 1,
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": 2,
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": 3,
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": 4,
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-]
-
 app.get('/api/persons', (req, res) => {
-    Note.find({}).then(persons => res.json(persons))
+    Phonebook.find({}).then(persons => res.json(persons))
 })
 
 app.get('/api/persons/:id', (req, res) => {
@@ -57,21 +34,12 @@ app.get('/api/persons/:id', (req, res) => {
 app.post('/api/persons', (req, res) => {
     const { name, number } = req.body
 
-    if(!name || !number || data.find(person => person.name === name)) {
-        res.status(400).json({ error: "name must be unique" })
-    } else {
-        const id = Math.floor(Math.random() * 10000000)
-        const phone = {
-            name,
-            number,
-            id
-        }
-
-        data = data.concat(phone)
-        res.json(phone)
+    if(!name || !number) {
+        return res.status(400).json({ error: "content missing" })
     }
 
-    
+    const phone = new Phonebook({ name, number })
+    phone.save().then(savedPhone => res.json(savedPhone)).catch(err => console.log(err.message))
 })
 
 app.delete('/api/persons/:id', (req, res) => {
