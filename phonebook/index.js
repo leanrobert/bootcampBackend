@@ -22,15 +22,16 @@ app.get('/api/persons', (req, res, next) => {
         .catch(error => next(error))
 })
 
-app.get('/api/persons/:id', (req, res) => {
-    const id = Number(req.params.id)
-    const note = data.find(note => note.id === id)
-
-    if(note) {
-        res.send(note)
-    } else {
-        res.status(404).end()
-    }
+app.get('/api/persons/:id', (req, res, next) => {
+    Phonebook.findById(req.params.id)
+        .then(person => {
+            if(person) {
+                res.json(person)
+            } else {
+                res.status(404).end()
+            }
+        })
+        .catch(error => next(error))
 })
 
 app.post('/api/persons', (req, res, next) => {
@@ -66,9 +67,9 @@ app.delete('/api/persons/:id', (req, res, next) => {
 }) 
 
 app.get('/info', (req, res) => {
-    const size = data.length
     const date = new Date()
-    res.send(`<div><p>Phonebook has info for ${size} people</p><p>${date}</p></div>`)
+    Phonebook.find({})
+        .then(persons => res.send(`<div><p>Phonebook has info for ${persons.length} people</p><p>${date}</p></div>`))
 })
 
 const errorHandling = (error, req, res, next) => {
