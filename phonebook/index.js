@@ -17,7 +17,9 @@ morgan.token('content', function (req, res) {
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :content'))
 
 app.get('/api/persons', (req, res) => {
-    Phonebook.find({}).then(persons => res.json(persons))
+    Phonebook.find({})
+        .then(persons => res.json(persons))
+        .catch(error => next(error))
 })
 
 app.get('/api/persons/:id', (req, res) => {
@@ -39,12 +41,15 @@ app.post('/api/persons', (req, res) => {
     }
 
     const phone = new Phonebook({ name, number })
-    phone.save().then(savedPhone => res.json(savedPhone)).catch(err => console.log(err.message))
+    phone.save()
+        .then(savedPhone => res.json(savedPhone))
+        .catch(error => next(error))
 })
 
-app.delete('/api/persons/:id', (req, res) => {
+app.delete('/api/persons/:id', (req, res, next) => {
     Phonebook.findByIdAndRemove(req.params.id)
         .then(res.status(204).end())
+        .catch(error => next(error))
 }) 
 
 app.get('/info', (req, res) => {
@@ -52,6 +57,18 @@ app.get('/info', (req, res) => {
     const date = new Date()
     res.send(`<div><p>Phonebook has info for ${size} people</p><p>${date}</p></div>`)
 })
+
+const errorHandling = (error, req, res, next) => {
+    console.error(error.message)
+
+    if (error.name === 'CastError') {
+        return res.status(400).send({ error: 'malformatted id' })
+    }
+
+    next(error)
+}
+
+app.use(errorHandling)
 
 const PORT = process.env.PORT
 
