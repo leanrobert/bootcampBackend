@@ -16,7 +16,7 @@ morgan.token('content', function (req, res) {
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :content'))
 
-app.get('/api/persons', (req, res) => {
+app.get('/api/persons', (req, res, next) => {
     Phonebook.find({})
         .then(persons => res.json(persons))
         .catch(error => next(error))
@@ -33,7 +33,7 @@ app.get('/api/persons/:id', (req, res) => {
     }
 })
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
     const { name, number } = req.body
 
     if(!name || !number) {
@@ -43,6 +43,19 @@ app.post('/api/persons', (req, res) => {
     const phone = new Phonebook({ name, number })
     phone.save()
         .then(savedPhone => res.json(savedPhone))
+        .catch(error => next(error))
+})
+
+app.put('/api/persons/:id', (req, res, next) => {
+    const body = req.body
+
+    const person = {
+        name: body.name,
+        number: body.number
+    }
+
+    Phonebook.findByIdAndUpdate(req.params.id, person, { new: true })
+        .then(updatedPerson => res.json(updatedPerson))
         .catch(error => next(error))
 })
 
