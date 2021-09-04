@@ -43,10 +43,8 @@ app.post('/api/persons', (req, res) => {
 })
 
 app.delete('/api/persons/:id', (req, res) => {
-    const id = Number(req.params.id)
-    data = data.filter(number => number.id !== id)
-
-    res.status(204).end()
+    Phonebook.findByIdAndRemove(req.params.id)
+        .then(res.status(204).end())
 }) 
 
 app.get('/info', (req, res) => {
