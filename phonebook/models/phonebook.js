@@ -4,7 +4,7 @@ const uniqueValidator = require('mongoose-unique-validator')
 const url = process.env.MONGODB_URI
 
 mongoose.connect(url)
-  .then(() => console.log('connected to MongoDB.git ad'))
+  .then(() => console.log('connected to MongoDB.git'))
   .catch(err => console.log('error connecting to MongoDB:', err.message))
 
 const personSchema = new mongoose.Schema({
