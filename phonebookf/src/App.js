@@ -33,8 +33,15 @@ const App = () => {
         number: newPhone
       }
 
-      create(person).then(promise => setPersons(persons.concat(promise.data)))
-      setMessage(`Contact ${person.name} was created successfully`)
+      create(person)
+        .then(promise => {
+          setPersons(persons.concat(promise.data))
+          setMessage(`Contact ${person.name} was created successfully`)
+        })
+        .catch(error => {
+          setError(error.message)
+        })
+      
       setTimeout(() => setMessage(null), 5000)
     }
     setNewName('')
